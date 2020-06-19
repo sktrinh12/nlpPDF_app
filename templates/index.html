@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+
+      <h1>{{ the_title }}</h1>
+      <hr>
+
+        <form action="/upload-pdf" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <label>Select PDF file</label>
+            <div class="custom-file">
+              <input oninput="filesize(this);" type="file" class="custom-file-input" name="pdf_up" id="pdf_up">
+            </div>
+          </div>
+          <br>
+          <button type="submit" class="btn btn-primary">Submit</button>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

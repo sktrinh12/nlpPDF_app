@@ -1,0 +1,64 @@
+from werkzeug.utils import secure_filename
+from spacy.lang.en.stop_words import STOP_WORDS
+from functions import *
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.tag import pos_tag
+from spacy import displacy
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+nlp_sci = spacy.load("en_core_sci_sm")
+stopwords = nltk.corpus.stopwords.words('english')
+
+#update new stop words
+update_stopw(nlp)
+update_stopw(nlp_sci)
+
+
+
+@app.route('/')
+@app.route('/index.html')
+def index():
+    return render_template('index.html', the_title='NLP PDF journal article keyword extraction')
+
+@app.route("/upload-pdf", methods=["GET", "POST"])
+def upload_pdf():
+    if request.method == "POST":
+        if request.files:
+            if not allowed_filesize(request.cookies.get("filesize")): #based on filesize
+                msg = 'File exceeded maximum size'
+                print(msg)
+                return redirect(request.url)
+
+            pdf_file = request.files["pdf_up"]
+
+            if pdf_file.filename == "": #no file name
+                msg = "File must have a filename"
+                print(msg)
+                return redirect(request.url)
+
+            if not allowed_file(pdf_file.filename): #file type
+                msg = 'That file is not acceptable'
+                print(msg)
+                return redirect(request.url)
+            else:
+                filename = secure_filename(pdf_file.filename)
+                filepath = os.path.join(app.config['PDF_UPLOADS'], filename)
+                pdf_file.save(filepath)
+
+            msg = f"pdf file saved ... {pdf_file}"
+            print(msg)
+
+            read_output = load_text(filepath)
+            pdf_o = nlp(read_output)
+            pdf_osci = nlp_sci(read_output)
+            print(pdf_o,'\n')
+            print(pdf_osci)
+
+            return redirect(request.url)
+    return render_template("index.html", the_title='NLP PDF journal article keyword extraction')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
