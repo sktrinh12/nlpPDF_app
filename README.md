@@ -1,11 +1,10 @@
-# Basic Flask App
+# NLP web-app to parse PDF journal articles 
 
-This small repo demonstrates a proper file structure for a Flask app. The folders named *static* and *templates* are required.
+This small flask application demonstrates use of NLTK and spaCy to extract keywords from PDF journal articles and render on the web-page for easy interpretation.
 
-**Routes** and **static files** are handled correctly in all `src` and `href` attributes in the template files.
-
-The template file `base.html` is used as a shell by the other three HTML templates. This means they insert content into `base.html` according to Jinja2 template rules.
-
+#### Installation
 After installing all dependencies, run the app by entering its folder and typing:
 
 `$ python routes.py`
+
+At the moment the file must be a `.txt` file however, in the future will implement `pdfminer` to convert to `.txt` file.
