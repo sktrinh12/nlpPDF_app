@@ -18,7 +18,7 @@ lemmatiser = WordNetLemmatizer()
 stemmer = PorterStemmer()
 REGEX_PATTERN = re.compile(r'\w{3,}[. ]|[ ]\w|^\d+|\w{1,}\d+') #rid of molecular formulas or starts with numbers 
 
-HTML_WRAPPER = """<div style="overflow-x: auto; border: 1px solid #e6e9ef; border-radius: 0.25rem; padding: 1rem">{}</div>"""
+HTML_WRAPPER = """<div style="overflow-x: auto; border: 0.75px solid #e6e9ef; border-radius: 0.25rem; padding: 0.75rem">{}</div>"""
 
 def allowed_file(filename):
     if not "." in filename:
@@ -242,15 +242,6 @@ def dplcy_sci(output_dply, title):
     html = displacy.render(pdf_o, style='ent', options = options)
     return html
 
-def dplcy_en(output_dply, title, POS_type):
-    pdf_o = nlp(output_dply)
-    #set titles and colours, options
-    pdf_o.user_data["title"] = title
-    colours = {POS_type : '#e6efff'}
-    options = {"ents": [POS_type], "colors": colours}
-    html = displacy.render(pdf_o, style='ent', options = options)
-    return html
-
 def rm_spec_char(string):
     #rid of strange chars
     return ''.join(' ' if not e.isalnum() else e for e in string.strip())
@@ -272,4 +263,4 @@ def tokenize_render(filepath, title_sci, title_en, POS_type):
     sci_output, en_output = output_display(f2_pdf, f2_pdf_sci)
     # print(sci_output)
     # print(en_output)
-    return format_html(dplcy_sci(sci_output, title_sci)), format_html(dplcy_en(en_output, title_en, POS_type))
+    return format_html(dplcy_sci(sci_output, title_sci)), format_html(dplcy_sci(en_output, title_en))
