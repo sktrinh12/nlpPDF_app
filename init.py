@@ -14,4 +14,4 @@ print(f'\n**ENV is set to: {app.config["ENV"]}**\n')
 
 app.config["PDF_UPLOADS"] = f"{cwd}/static/uploads"
 app.config["ALLOWED_FILE_EXT"] = ["PDF", "TXT"]
-app.config["MAX_FILESIZE"] = 50000 #bytes 
+app.config["MAX_FILESIZE"] = 8 * 1024 * 1024#bytes 
