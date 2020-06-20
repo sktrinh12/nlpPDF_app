@@ -250,7 +250,7 @@ def format_html(html):
     html = html.replace("\n\n","\n")
     return HTML_WRAPPER.format(html) #adjust border and style
 
-def tokenize_render(filepath, title_sci, title_en, POS_type):
+def tokenize_render(filepath, title_sci, title_en):
     read_output = load_text(filepath)
     pdf_o = nlp(read_output) #tokenize based on regular eng words
     pdf_osci = nlp_sci(read_output) #tokenize based on scientific words
