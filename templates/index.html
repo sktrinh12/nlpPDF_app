@@ -2,6 +2,7 @@
 
 {% block body %}
 
+
 <div class="container">
   <div class="row">
     <div class="col">
@@ -11,17 +12,42 @@
 
         <form action="/upload-pdf" method="POST" enctype="multipart/form-data">
           <div class="form-group">
-            <label>Select PDF file</label>
+            <label>Select file</label>
             <div class="custom-file">
-              <input oninput="filesize(this);" type="file" class="custom-file-input" name="pdf_up" id="pdf_up">
+              <input type="file" class="custom-file-input" name="pdf_up" id="pdf_up">
             </div>
           </div>
           <br>
           <button type="submit" class="btn btn-primary">Submit</button>
 
       </form>
+      
+      <div class="row" id="flash-msg">
+      {% with errors = get_flashed_messages(category_filter=["warning"]) %}
+          {% if errors %}
+              {%- for message in errors %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                      <span>{{ message }}</span>
+                      <button onclick="close_btn()" type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+              {% endfor -%}
+          {% endif %}
+      {% endwith %}
+      </div>
+
     </div>
   </div>
 </div>
 
+{% endblock %}
+
+
+{% block script %}
+<script>
+  function close_btn(){
+    $('#flash-msg').html("");
+  };
+</script>
 {% endblock %}
