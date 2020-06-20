@@ -7,8 +7,8 @@
 body {
     font-family: 'Source Sans Pro', sans-serif;
     font-size: 100%;
-    color: #000;
-    background: #407189;
+    /* color: #000; */
+    /* background: #407189; */
     margin: 0;
 }
 
@@ -30,32 +30,13 @@ h2 {
     font-size: 2em;
 }
 
-p, li {
-    font-size: 1.4em;
-}
-
-/* links */
-
-a {
-    color: #1484bc;
-    text-decoration: none;
-}
-
-a:hover {
-    color: #407189;
-    text-decoration: underline;
-}
-
-
-/* media queries */
-
-@media (max-width: 1050px) {
-    body {
-        background: #f1f7dc;
-    }
-    #container {
-        margin: 0;
-        width: 100%;
-        padding: 2em;
-    }
-}
+/* @media (max-width: 1050px) { */
+/*     body { */
+/*         background: #f1f7dc; */
+/*     } */
+/*     #container { */
+/*         margin: 0; */
+/*         width: 100%; */
+/*         padding: 2em; */
+/*     } */
+/* } */
