@@ -11,9 +11,10 @@ def index():
 @app.route("/upload-pdf", methods=["GET", "POST"])
 def upload_pdf():
     if request.method == "POST":
-        if request.files:
-            if not allowed_filesize(request.cookies.get("filesize")): #based on filesize
-                msg = 'File exceeded maximum size'
+        if request.files and "filesize" in request.cookies:
+            if not allowed_filesize(request.cookies.get("filesize")):
+                #based on filesize
+                msg = f'File exceeded maximum size {request.cookies.get("filesize")}'
                 print(msg)
                 flash(msg, 'warning')
                 return redirect('/', code=302)
@@ -34,12 +35,13 @@ def upload_pdf():
                 print(msg)
                 sci_output, en_output = tokenize_render(filepath, \
                                 'Long-version keyword extraction', \
-                                'Short-version keyword extraction', \
-                                'ENTITY')
+                                'Short-version keyword extraction'
+                                )
                 return render_template("upload_pdf.html", \
                         sci_output=sci_output, \
                         en_output=en_output, \
-                        the_title='NLP PDF journal article keyword extraction')
+                        filename=filename, \
+                        the_title=title)
             else:
                 msg = 'That file is not acceptable, should be .txt or .pdf'
                 flash(msg, 'warning')
