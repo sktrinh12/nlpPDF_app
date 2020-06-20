@@ -2,3 +2,4 @@
 *.pyo
 /models/*
 ./models
+\<Plug\>_
