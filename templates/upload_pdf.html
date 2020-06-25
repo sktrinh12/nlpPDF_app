@@ -6,16 +6,16 @@
   <div class="row">
     <div class="col">
 
-      <h1>{{ the_title }}</h1>
+    <a href="{{ url_for('index') }}"><h1>{{ the_title }}</h1></a>
       <hr>
 
       <div class="row">
-      <div class="col-4">
+      <div class="col-7">
         <form action="/upload-pdf" method="POST" enctype="multipart/form-data">
           <div class="form-group">
             <div class="custom-file">
               <input oninput="filesize(this);" type="file" class="custom-file-input" name="pdf_up" id="pdf_up">
-              <label class="custom-file-label" for="pdf_up">Select file</label>
+              <label class="custom-file-label" for="pdf_up">Select file (.txt or .pdf)</label>
             </div>
           </div>
        </div>
@@ -32,16 +32,43 @@
       </form>
       <br>
 
+      <br>
+
+      <div class="row">
+          <h4><strong>Filename: </strong>{{ filename }}</h4>
+          <table class="table table-responsive-md btn-table">
+
+          <tbody>
+
+            <tr>
+                <th scope="row"><stong>Possible NSC</stong></th>
+              <td> {{ nscs }} </td>
+            </tr>
+
+            <tr>
+                <th scope="row"><stong>Possible Page No.</stong></th>
+                <td> {{ pg_no }} </td>
+            </tr>
+
+            <tr>
+                <th scope="row"></th>
+                <td></td>
+            </tr>
+          </tbody>
+
+</table>
+      </div>
+
       </div>
         <div class="row">
-          <h3>Output 1</h3>
+          <h3 class="blue-primary">OUTPUT 1</h3>
           {{ en_output|markdown }}
         </div>
     
         <br>
 
         <div class="row">
-          <h3>Output 2</h3>
+          <h3 class="blue-primary">OUTPUT 2</h3>
           {{ sci_output|markdown }}
         </div>
   </div>
