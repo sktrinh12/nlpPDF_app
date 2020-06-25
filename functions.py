@@ -8,6 +8,11 @@ from nltk.tag import pos_tag
 from spacy import displacy
 from spacy.lang.en.stop_words import STOP_WORDS
 import spacy
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import TextConverter
+from pdfminer.pdfpage import PDFPage
+from pdfminer.layout import LAParams
+from io import BytesIO
 
 nlp = spacy.load("en_core_web_sm")
 nlp_sci = spacy.load("en_core_sci_sm")
@@ -169,14 +174,18 @@ def check_if_name_related(q_word,verbose=False):
 
 voted_classifier = vote_clf()
 
-#load raw pdf text
-def load_text(filepath):
-    with open(filepath, 'r') as f:
-        read_output = f.readlines()
-    read_output = '\n'.join(read_output).strip().replace('\n','')
+def load_text(load_input): #just read raw text form or from pdf
+    if load_input.endswith('.txt'): # just load from text
+        with open(load_input, 'r') as f:
+            text_body = f.readlines()
+    else: # load body of text after pdfminer
+        text_body = pdf_parse(load_input)
+    read_output = '\n'.join(text_body).strip().replace('\n','')
+    return read_output
+
+def rm_file(filepath):
     if os.path.exists(filepath): #after reading in the text and saving to var, delete file to tidy
         os.remove(filepath)
-    return read_output
 
 def filter_text_stopw(pdf_text):
     '''
@@ -251,11 +260,14 @@ def format_html(html):
     return HTML_WRAPPER.format(html) #adjust border and style
 
 def tokenize_render(filepath, title_sci, title_en):
-    read_output = load_text(filepath)
-    pdf_o = nlp(read_output) #tokenize based on regular eng words
-    pdf_osci = nlp_sci(read_output) #tokenize based on scientific words
+    text_body = load_text(filepath)
+    if text_body:
+        rm_file(filepath) #clean up file in static folder
+    pdf_o = nlp(text_body) #tokenize based on regular en words
+    pdf_osci = nlp_sci(text_body) #tokenize based on scientific words
     f_pdf_o = nlp(' '.join(filter_text_stopw(pdf_o))) #filter stop words then tag it again
     f_pdf_osci = nlp_sci(' '.join(filter_text_stopw(pdf_osci)))
+    sci_output, en_output = f"{f_pdf_osci}", f"{f_pdf_o}"
     pdf_pt = [(n, i, i.tag_) for n,i in enumerate(f_pdf_o)]
     pdf_ptsci = [(n, i, i.tag_) for n,i in enumerate(f_pdf_osci)] #part of speech tags
     f2_pdf_sci = filter_text_pos(pdf_ptsci,['NN', 'NNS', 'VBN', 'NNP'])
@@ -263,4 +275,64 @@ def tokenize_render(filepath, title_sci, title_en):
     sci_output, en_output = output_display(f2_pdf, f2_pdf_sci)
     # print(sci_output)
     # print(en_output)
-    return format_html(dplcy_sci(sci_output, title_sci)), format_html(dplcy_sci(en_output, title_en))
+    dict_elements = {}
+    dict_elements['sci_output'] = format_html(dplcy_sci(sci_output, title_sci))
+    dict_elements['en_output'] = format_html(dplcy_sci(en_output, title_en))
+    dict_elements['pg_no'] = extract_pg_no(text_body)
+    dict_elements['nscs'] = extract_nsc(text_body)
+    # print(dict_elements['nscs'])
+    # print(dict_elements['pg_no'])
+    return dict_elements
+
+def pdf_parse(filepath):
+    manager = PDFResourceManager()
+    retstr = BytesIO()
+    layout = LAParams(all_texts=True)
+    device = TextConverter(manager, retstr, laparams=layout)
+    with open(filepath, 'rb') as pdf_file:
+        interpreter = PDFPageInterpreter(manager, device)
+        for page in PDFPage.get_pages(pdf_file, check_extractable=True):
+            interpreter.process_page(page)
+
+        text = retstr.getvalue()
+        device.close()
+        retstr.close()
+    return text.decode('utf-8')
+
+def extract_pg_no(text_body):
+    try:
+        def frequent_nums(list_of_matches):
+            return sorted(set(list_of_matches), key = list_of_matches.count)
+        # matches = re.findall(r'(\d{1,6}[^A-Za-z\d,±×\:©;#%*¢.\]\)\(\\\'\/]{1,3}\d{1,6})', text_body)
+        matches = re.findall(r'(\d{1,5}[\u2013|\s|-|\d]{1,2}\d{2,5})', text_body)
+        matches = frequent_nums(matches)
+        return f"{' | '.join(matches)}"
+    except ValueError as e:
+        return "Couldn't extract"
+
+def nsc_exclude(ls_vouch_nsc):
+    if isinstance(ls_vouch_nsc, list):
+        res_list = []
+        for n in ls_vouch_nsc:
+            if 'C' not in n and not 'H' in n:
+                res_list.append(n)
+    else:
+        res_list = ls_vouch_nsc
+    return res_list
+
+def extract_nsc(text_body):
+    vouch_nsc = re.findall(r'([J|C|N|Q|F|M]{1}\d{2,}\w+)', text_body)
+    try:
+        vouch_nsc = [r for r in vouch_nsc if len(r) < 10 and len(r) > 4]
+    except:
+        vouch_nsc = "Couldn't extract"
+    print(vouch_nsc)
+    if len(vouch_nsc) > 1:
+        vouch_nsc = nsc_exclude(vouch_nsc)
+        vouch_nsc = ', '.join(vouch_nsc)
+    else:
+        if vouch_nsc:
+            vouch_nsc = vouch_nsc[0].strip()
+        else:
+            vouch_nsc = "Couldn't extract"
+    return vouch_nsc
