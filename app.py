@@ -33,14 +33,18 @@ def upload_pdf():
                 pdf_file.save(filepath)
                 msg = f"pdf file saved ... {pdf_file}"
                 print(msg)
-                sci_output, en_output = tokenize_render(filepath, \
-                                'Long-version keyword extraction', \
-                                'Short-version keyword extraction'
+
+                dict_output = tokenize_render(filepath, \
+                                'long-version keyword extraction', \
+                                'short-version keyword extraction'
                                 )
+
                 return render_template("upload_pdf.html", \
-                        sci_output=sci_output, \
-                        en_output=en_output, \
+                        sci_output=dict_output['sci_output'], \
+                        en_output=dict_output['en_output'], \
                         filename=filename, \
+                        nscs=dict_output['nscs'], \
+                        pg_no=dict_output['pg_no'], \
                         the_title=title)
             else:
                 msg = 'That file is not acceptable, should be .txt or .pdf'
