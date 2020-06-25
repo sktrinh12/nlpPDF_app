@@ -7,16 +7,16 @@
   <div class="row">
     <div class="col">
 
-      <h1>{{ the_title }}</h1>
+    <a href="{{ url_for('index') }}"><h1>{{ the_title }}</h1></a>
       <hr>
 
       <div class="row">
-      <div class="col-4">
+      <div class="col-7">
         <form action="/upload-pdf" method="POST" enctype="multipart/form-data">
           <div class="form-group">
             <div class="custom-file">
               <input type="file" class="custom-file-input" name="pdf_up" id="pdf_up">
-              <label class="custom-file-label" for="pdf_up">Select file</label>
+              <label class="custom-file-label" for="pdf_up">Select file (.txt or .pdf)</label>
             </div>
           </div>
        </div>
