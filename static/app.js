@@ -18,3 +18,15 @@ document.querySelector('.custom-file-input').addEventListener('change',function(
   var nextSibling = e.target.nextElementSibling
   nextSibling.innerText = fileName
 });
+
+// loader appears in between pages and links
+window.addEventListener("load", function () {
+    const loaderWrap = document.querySelector(".loader-wrapper");
+    loaderWrap.className += " hidden";
+});
+
+// loader appears after click button and waiting for flask to finish
+function loading() {
+    document.querySelector(".loader-wrapper").className = "loader-wrapper";
+    clear_fz();
+};
