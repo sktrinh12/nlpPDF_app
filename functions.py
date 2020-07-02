@@ -276,7 +276,11 @@ def tokenize_render(filepath, title_sci, title_en):
     # print(sci_output)
     # print(en_output)
     dict_elements = {}
+    if not sci_output:
+        sci_output = "Could not find any keywords"
     dict_elements['sci_output'] = format_html(dplcy_sci(sci_output, title_sci))
+    if not en_output:
+        en_output =  "Could not find any keywords"
     dict_elements['en_output'] = format_html(dplcy_sci(en_output, title_en))
     dict_elements['pg_no'] = extract_pg_no(text_body)
     dict_elements['nscs'] = extract_nsc(text_body)
