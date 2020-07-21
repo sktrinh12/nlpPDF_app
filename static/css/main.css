@@ -4,6 +4,33 @@
     box-sizing: border-box;
 }
 
+
+table td:hover {
+  background-color: #b3dfff;
+  font-weight:bold;
+  transition: background-color .5s;
+}
+
+table th {
+  width:200px;
+}
+
+#wordpair-table {
+  border-spacing: 0.3em;
+  margin: 1rem auto;
+  border-collapse: separate;
+  width: auto;
+  margin-left: 0px;
+  margin-right: auto;
+}
+
+#wordpair-col {
+  padding: 1rem 1rem;
+  border-radius: 6px;
+  border: 0.01em solid;
+  text-align:center;
+}
+
 body {
     font-family: 'Source Sans Pro', sans-serif;
     font-size: 100%;
