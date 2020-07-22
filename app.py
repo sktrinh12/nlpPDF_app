@@ -48,8 +48,8 @@ def upload_pdf():
     if request.method == "POST":
         if request.files and "filesize" in request.cookies:
             print(f'filesize={request.cookies.get("filesize")}')
-            check_file_size = allowed_filesize(request.cookies.get("filesize"))
-            if not check_file_size:
+            
+            if not allowed_filesize(request.cookies.get("filesize")):
                 #based on filesize
                 msg = f'File exceeded maximum size, ({int(request.cookies.get("filesize"))/1e6:0.2f}MB > 5MB)'
                 print(msg)
@@ -73,6 +73,8 @@ def upload_pdf():
 
                 poss_wp, poss_nscs = tokenise_render_v2(filepath)
 
+                print(poss_wp)
+
                 return render_template("upload_pdf.html", \
                         filename=filename, \
                         poss_wp=poss_wp, \
@@ -80,7 +82,7 @@ def upload_pdf():
                         the_title=title)
             else:
                 msg = 'That file is not acceptable, should be .txt or .pdf'
-                if pdf_file.filename != "" and check_file_size: # hackish way to prevent double flash messasge
+                if pdf_file.filename != "": # hackish way to prevent double flash messasge
                     flash(msg, 'warning')
                     print(msg)
                 # return redirect('/', code=302)
