@@ -1,5 +1,4 @@
 from nltk.stem import PorterStemmer #WordNetLemmatizer
-#import nltk
 from models import *
 from collections import defaultdict # to get unique values in list
 import re
@@ -7,9 +6,6 @@ import os
 from nltk.tokenize import word_tokenize
 from nltk.tag import pos_tag
 from nltk.corpus import stopwords
-# from spacy import displacy
-# from spacy.lang.en.stop_words import STOP_WORDS
-# import spacy
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 from pdfminer.pdfpage import PDFPage
@@ -258,13 +254,13 @@ def vote_clf():
                 classifiers_models[model_name] = joblib.load(pkl_fi)
     return classifiers_models
 
-def check_if_name_related(q_word,verbose=False):
-    return_result = {}
-    return_result['Classification'] = voted_classifier.classify(q_word)
-    return_result['Confidence'] = voted_classifier.confidence(q_word)*100
-    if verbose:
-        print(f"Classification: {return_result['Classification']} Confidence: {return_result['Confidence']}", )
-    return return_result['Classification']
+# def check_if_name_related(q_word,verbose=False):
+#     return_result = {}
+#     return_result['Classification'] = voted_classifier.classify(q_word)
+#     return_result['Confidence'] = voted_classifier.confidence(q_word)*100
+#     if verbose:
+#         print(f"Classification: {return_result['Classification']} Confidence: {return_result['Confidence']}", )
+#     return return_result['Classification']
 
 # load the pickle models from file and save into dictionary
 voted_classifier_dict = vote_clf()
@@ -324,9 +320,9 @@ def rtn_possible_wp(vc, pdf_pt):
     return ["Sorry, failed to find taxonomy-like names in the document"]
 
 
-def format_html(html):
-    html = html.replace("\n\n","\n")
-    return HTML_WRAPPER.format(html) #adjust border and style
+# def format_html(html):
+#     html = html.replace("\n\n","\n")
+#     return HTML_WRAPPER.format(html) #adjust border and style
 
 def tokenise_render_v2(filepath):
     text_body = load_text(filepath)
@@ -367,7 +363,9 @@ def nsc_exclude(ls_vouch_nsc):
     return res_list
 
 def extract_nsc(text_body):
+    # vouch_nsc = re.findall(r'(^[JCNQFM]{1}\w{1,}\d{2,})', text_body)
     vouch_nsc = re.findall(r'([J|C|N|Q|F|M]{1}\d{2,}\w+)', text_body)
+    # vouch_nsc = re.findall(r'([^ABD-IK-LO-PR-Zabd-ik-lo-pr-z]\w+\d{2,})', text_body)
     try:
         vouch_nsc = [r for r in vouch_nsc if len(r) < 10 and len(r) > 4]
     except:
