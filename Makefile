@@ -20,4 +20,3 @@ run:
 stop:
 	@echo "Killing $(app_name) ..."
 	@docker ps | grep $(app_name) | awk '{print $1}' | xargs docker stop
-
