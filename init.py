@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash#, jsonify, make_response
+from flask import Flask, render_template, request, redirect, flash
 
 app = Flask(__name__)
 cwd = app.root_path
