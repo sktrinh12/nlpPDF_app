@@ -3,3 +3,5 @@
 /models/*
 ./models
 \<Plug\>_
+models/*
+.DS_Store
