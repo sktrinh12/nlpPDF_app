@@ -1,9 +1,10 @@
 #Gunicorn configuration file
-from multiprocessing import cpu_count
+# from multiprocessing import cpu_count
 bind = '0.0.0.0:8050'
 backlog = 2048
-threads = 2
-workers = cpu_count()
+threads = 1 
+# workers = cpu_count()
+workers = 2
 worker_class = 'sync'
 worker_connections = 1000
 timeout = 120
