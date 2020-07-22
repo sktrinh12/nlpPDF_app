@@ -28,9 +28,9 @@
       <br>
 
       <div class="row">          
-      <div class="col-4">
-      <button onclick="loading();" type="submit" id="submit-btn" class="btn btn-primary">Submit</button>
-      </div>
+        <div class="col-4">
+          <button onclick="loading();" type="submit" id="submit-btn" class="btn btn-primary">Submit</button>
+        </div>
       </div>
 
       </form>
@@ -38,43 +38,65 @@
 
       <br>
 
-      <div class="row" id="output-result">
-          <h4><strong>Filename: </strong>{{ filename }}</h4>
-          <table class="table table-responsive-md btn-table">
+      <h3><span class="blue-primary">Filename: </span>{{ filename }}</h3>
 
-          <tbody>
+      <hr>
+      <br>
 
-            <tr>
-                <th scope="row"><stong>Possible NSC</stong></th>
-              <td> {{ nscs }} </td>
-            </tr>
+          <h3 class="blue-primary"><stong>Possible NSC:</stong></h3>
 
-            <tr>
-                <th scope="row"><stong>Possible Page No.</stong></th>
-                <td> {{ pg_no }} </td>
-            </tr>
+          <table class="wordpair-table">
+                {% set max_columns = 5 %}
+                  {% if nscs|length <= max_columns %}
+                    {% set rows = 1 %}
+                  {% else %}
+                    {% set rows = (nscs|length % max_columns) %}
+                    {{ nscs|length}}
+                  {% endif %}
 
-            <tr>
-                <th scope="row"></th>
-                <td></td>
-            </tr>
-          </tbody>
+                  {% for r in range(rows) %}
+                    <tr>
+                      {% for c in range(max_columns) %}
+                        {% set cell_pos = (r * max_columns) + c %}
+                        {% if cell_pos < nscs|length %}
+                          <td class="wordpair-col"> 
+                            {{ nscs[cell_pos] }}
+                          </td>
+                        {% endif %}
+                      {% endfor %}
+                    </tr>
+                  {% endfor %}
+         </table>
 
-		 </table>
-      </div>
+      <br>
+      <hr>
 
-      </div>
-        <div class="row">
-          <h3 class="blue-primary">OUTPUT 1</h3>
-          {{ en_output|markdown }}
-        </div>
-    
-        <br>
+            <h3 class="blue-primary">Guesstimated Taxonomy Name:</h3>
 
-        <div class="row">
-          <h3 class="blue-primary">OUTPUT 2</h3>
-          {{ sci_output|markdown }}
-        </div>
+              <table class="wordpair-table">
+                
+                {%  set max_columns = 3 %}
+                    {% if poss_wp|length % max_columns == 0 %}
+                      {% set buffer = 0 %}
+                    {% else %}
+                      {% set buffer = 1 %}
+                    {% endif %}
+
+                    {% set interval = poss_wp|length / max_columns %}
+                    {% set rows = interval|int + buffer %}    
+                      {% for p in range(rows) %}
+                        <tr>
+                          {% for n in range(max_columns) %}
+                            {% set cell_pos = (p * max_columns) + n %}
+                              {% if cell_pos < poss_wp|length %}
+                                <td class="wordpair-col">{{ poss_wp[cell_pos] }}</td>
+                              {% endif %}
+                          {% endfor %}
+                        </tr>
+                      {% endfor %}
+              </table>
+
+    </div>
   </div>
 </div>
 
