@@ -5,3 +5,4 @@
 \<Plug\>_
 models/*
 .DS_Store
+build.sh
