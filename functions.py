@@ -1,6 +1,7 @@
 from nltk.stem import PorterStemmer #WordNetLemmatizer
 #import nltk
 from models import *
+from collections import defaultdict # to get unique values in list
 import re
 import os
 from nltk.tokenize import word_tokenize
@@ -15,12 +16,8 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.layout import LAParams
 from io import BytesIO
 
-# nlp = spacy.load("en_core_web_sm")
-# nlp_sci = spacy.load("en_core_sci_sm")
-# stopwords = nltk.corpus.stopwords.words('english')
 stop_words_list = stopwords.words('english')
 
-# lemmatiser = WordNetLemmatizer()
 stemmer = PorterStemmer()
 REGEX_PATTERN = re.compile(r'\w{3,}[. ]|[ ]\w|^\d+|\w{1,}\d+') #rid of molecular formulas or starts with numbers 
 
@@ -86,31 +83,6 @@ def convert_to_binary(df):
         df[f'last_letters_{i}'] = df[f'last_letters_{i}'].apply(lambda x: ''.join(format(ord(w), 'b') for w in x) )
         df[f'first_letters_{i}'] = df[f'first_letters_{i}'].apply(lambda x: ''.join(format(ord(w), 'b') for w in x) )
     return df
-
-# def convert_chr(name):
-# 	chr_list = []
-# 	for l in name:
-# 		chr_list.append(ord(l.lower()))
-# 	return sum(chr_list)
-
-# def lemma_binary(word):
-#     '''
-#     Output overlapping words from a lemmatised word compared to the original word
-#     '''
-#     l_word = lemmatiser.lemmatize(word)
-#     word_lemma_dict = {'word_length' : len(word), 'lw_length' : len(l_word)}
-#     max_length = max(word_lemma_dict.values())
-#     longer_length_word = [k for k,v in word_lemma_dict.items() if v == max_length][0]
-#     for _ in range(max_length - word_lemma_dict['lw_length']):
-#         l_word += '0'
-#     binary_output = []
-#     for w,lw in zip(word,l_word):
-#         if w == lw:
-#             binary_output.append(1)
-#         else:
-#             binary_output.append(0)
-
-#     return binary_output.count(1)/len(binary_output)
 
 vowels = "aeiouyAEIOUY"
 
@@ -218,15 +190,6 @@ def find_features(two_words):
            }
 
 
-def update_stopw(nlp):
-    for e in ").,-~%;:(/@! &*#`":
-        nlp.vocab[e].is_stop = True
-    print(f'updated stop words for {nlp} !')
-
-#update new stop words
-# update_stopw(nlp)
-# update_stopw(nlp_sci)
-
 class VoteClassifier(object):
     def __init__(self, classifiers, weights=None): #list of classifiers
         self._classifiers_dict = classifiers
@@ -323,21 +286,6 @@ def rm_file(filepath):
     if os.path.exists(filepath): #after reading in the text and saving to var, delete file to tidy
         os.remove(filepath)
 
-# def filter_text_stopw(pdf_text):
-#     '''
-#     filter text based on stop words; regular english web
-#     '''
-#     token_list = []
-#     for token in pdf_text:
-#         token_list.append(token.text)
-
-#     filtered_pdf =[]
-#     for word in token_list:
-#         lexeme = nlp.vocab[word]
-#         if lexeme.is_stop == False:
-#             filtered_pdf.append(word)
-#     return filtered_pdf
-
 def filter_text_pos(pdf_pt):
     '''
     filter text based on part of speech tag and neighbouring characteristics
@@ -370,49 +318,11 @@ def rtn_possible_wp(vc, pdf_pt):
     for wp in filter_text_pos(pdf_pt):
         res = vc.classify(wp)
         if res:
-            #print(cnt, wp)
             possible_list.append(wp)
-    return list(set(possible_list))
+    if possible_list:
+        return list(defaultdict.fromkeys(possible_list).keys())
+    return ["Sorry, failed to find taxonomy-like names in the document"]
 
-
-#def output_display(f_pdf, f_pdfsci):
-#    out_dply_set_en = set()
-#    out_dply_set_sci = set()
-#    out_dply_ls_en = []
-#    out_dply_ls_sci = []
-
-#    try:
-#        for i in f_pdfsci:
-#            string_word = rm_spec_char(str(i[1]).lower())
-#            if not re.search(REGEX_PATTERN,string_word):
-#                if string_word not in out_dply_set_sci:
-#                    out_dply_ls_sci.append(str(i[1]))
-#                out_dply_set_sci.add(string_word)
-#        for j in f_pdf:
-#            string_word = rm_spec_char(str(j[1]).lower())
-#            res = check_if_name_related(string_word)
-#            if res and not re.search(REGEX_PATTERN,string_word):
-#                if string_word not in out_dply_set_en:
-#                    out_dply_ls_en.append(str(j[1]))
-#                out_dply_set_en.add(string_word)
-#    except TypeError as e:
-#        pass
-
-#    return (' '.join(out_dply_ls_sci), \
-#            ' '.join(out_dply_ls_en))
-
-#def dplcy_sci(output_dply, title):
-#    pdf_o = nlp_sci(output_dply)
-#    #set titles and colours, options
-#    pdf_o.user_data["title"] = title
-#    colours = {"ENTITY" : '#e6efff'}
-#    options = {"ents": ["ENTITY"], "colors": colours}
-#    html = displacy.render(pdf_o, style='ent', options = options)
-#    return html
-
-#def rm_spec_char(string):
-#    #rid of strange chars
-#    return ''.join(' ' if not e.isalnum() else e for e in string.strip())
 
 def format_html(html):
     html = html.replace("\n\n","\n")
@@ -429,35 +339,6 @@ def tokenise_render_v2(filepath):
     poss_nscs = extract_nsc(text_body)
     return poss_wp, poss_nscs
 
-# def tokenize_render(filepath, title_sci, title_en):
-#     text_body = load_text(filepath)
-#     if text_body:
-#         rm_file(filepath) #clean up file in static folder
-#     pdf_o = nlp(text_body) #tokenize based on regular en words
-#     pdf_osci = nlp_sci(text_body) #tokenize based on scientific words
-#     f_pdf_o = nlp(' '.join(filter_text_stopw(pdf_o))) #filter stop words then tag it again
-#     f_pdf_osci = nlp_sci(' '.join(filter_text_stopw(pdf_osci)))
-#     sci_output, en_output = f"{f_pdf_osci}", f"{f_pdf_o}"
-#     pdf_pt = [(n, i, i.tag_) for n,i in enumerate(f_pdf_o)]
-#     pdf_ptsci = [(n, i, i.tag_) for n,i in enumerate(f_pdf_osci)] #part of speech tags
-#     f2_pdf_sci = filter_text_pos(pdf_ptsci,['NN', 'NNS', 'VBN', 'NNP'])
-#     f2_pdf = filter_text_pos(pdf_pt) #use of default POS tag list
-#     sci_output, en_output = output_display(f2_pdf, f2_pdf_sci)
-#     # print(sci_output)
-#     # print(en_output)
-#     dict_elements = {}
-#     if not sci_output:
-#         sci_output = "Could not find any keywords"
-#     dict_elements['sci_output'] = format_html(dplcy_sci(sci_output, title_sci))
-#     if not en_output:
-#         en_output =  "Could not find any keywords"
-#     dict_elements['en_output'] = format_html(dplcy_sci(en_output, title_en))
-#     dict_elements['pg_no'] = extract_pg_no(text_body)
-#     dict_elements['nscs'] = extract_nsc(text_body)
-#     # print(dict_elements['nscs'])
-#     # print(dict_elements['pg_no'])
-#     return dict_elements
-
 def pdf_parse(filepath):
     manager = PDFResourceManager()
     retstr = BytesIO()
@@ -473,22 +354,13 @@ def pdf_parse(filepath):
         retstr.close()
     return text.decode('utf-8')
 
-# def extract_pg_no(text_body):
-#     try:
-#         def frequent_nums(list_of_matches):
-#             return sorted(set(list_of_matches), key = list_of_matches.count)
-#         # matches = re.findall(r'(\d{1,6}[^A-Za-z\d,±×\:©;#%*¢.\]\)\(\\\'\/]{1,3}\d{1,6})', text_body)
-#         matches = re.findall(r'(\d{1,5}[\u2013|\s|-|\d]{1,2}\d{2,5})', text_body)
-#         matches = frequent_nums(matches)
-#         return f"{' | '.join(matches)}"
-#     except ValueError as e:
-#         return "Couldn't extract"
-
 def nsc_exclude(ls_vouch_nsc):
     if isinstance(ls_vouch_nsc, list):
         res_list = []
         for n in ls_vouch_nsc:
-            if 'C' not in n and not 'H' in n:
+            if 'C' in n and 'H' in n:
+                pass
+            else:
                 res_list.append(n)
     else:
         res_list = ls_vouch_nsc
@@ -499,14 +371,18 @@ def extract_nsc(text_body):
     try:
         vouch_nsc = [r for r in vouch_nsc if len(r) < 10 and len(r) > 4]
     except:
-        vouch_nsc = "Couldn't extract"
+        vouch_nsc = ["Didn't find any NSCs"]
     print(vouch_nsc)
     if len(vouch_nsc) > 1:
         vouch_nsc = nsc_exclude(vouch_nsc)
-        vouch_nsc = ', '.join(vouch_nsc)
+        if not vouch_nsc:
+            # if after removing CH formulas and the list becomes empty
+            return ["Didn't find any NSCs"]
+        vouch_nsc = list(defaultdict.fromkeys(vouch_nsc).keys())
     else:
         if vouch_nsc:
-            vouch_nsc = vouch_nsc[0].strip()
+            # if just one found
+            vouch_nsc = vouch_nsc
         else:
-            vouch_nsc = "Couldn't extract"
+            vouch_nsc = ["Didn't find any NSCs"]
     return vouch_nsc
