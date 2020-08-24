@@ -15,7 +15,7 @@ from io import BytesIO
 stop_words_list = stopwords.words('english')
 
 stemmer = PorterStemmer()
-REGEX_PATTERN = re.compile(r'\w{3,}[. ]|[ ]\w|^\d+|\w{1,}\d+') #rid of molecular formulas or starts with numbers 
+REGEX_PATTERN = re.compile(r'\w{3,}[. ]|[ ]\w|^\d+|\w{1,}\d+') #rid of molecular formulas or starts with numbers
 
 HTML_WRAPPER = """<div style="overflow-x: auto; border: 0.75px solid #e6e9ef; border-radius: 0.25rem; padding: 0.75rem">{}</div>"""
 
@@ -33,7 +33,7 @@ def calc_weights():
         'rf' : 0.849,
         'bern' :0.731
         }
-    # calculate the Rank order centroid; these weighting values are higher 
+    # calculate the Rank order centroid; these weighting values are higher
     weights = {k : 0 for k in scores.keys()}
     K = len(voted_classifier_dict)
     # sort the scores by value x[1] index and use the enumerable as j
@@ -64,7 +64,7 @@ def filter_nonchar(paragraph_list):
             len(s) > 3 and \
             re.search(r'[^ATCG]', s)]
 
-# function to format the features into a column to prepare for making into np array and easily predict usign clf 
+# function to format the features into a column to prepare for making into np array and easily predict usign clf
 def format_feats_into_df(word):
     df = pd.DataFrame(find_features(word).items()).transpose()
     df.columns = df.iloc[0].copy()
@@ -72,7 +72,7 @@ def format_feats_into_df(word):
     df.drop([0], inplace=True)
     return df.iloc[0]
 
-# function to convert the strings to binary in order to input into machine learning algos 
+# function to convert the strings to binary in order to input into machine learning algos
 def convert_to_binary(df):
     """convert the first and last letters to binary"""
     for i in range(1,3):
@@ -245,7 +245,8 @@ def vote_clf():
     Load the trained or pre-trained pickled algorithm
     returns the voted classifier dictionary
     '''
-    wd = cwd + '/models/'
+    wd = os.path.join(cwd, 'models')
+    print(f"current working directory: {wd}")
     classifiers_models = {}
     for fi in os.listdir(wd):
         if 'taxon_names' in fi and fi.endswith('pkl'):
@@ -296,8 +297,8 @@ def filter_text_pos(pdf_pt):
                     # if the neighbouring word is lowercase or uppercase
                     if pdf_pt[i+1][0].islower() or pdf_pt[i+1][0].isupper():
                         # if the first letter of the first word is uppercase
-                        if pt[0][0].isupper(): # if first letter is capitalised 
-                            # append the word pair 
+                        if pt[0][0].isupper(): # if first letter is capitalised
+                            # append the word pair
                             filtered_nnp.append(f'{pt[0]} {pdf_pt[i+1][0]}' )
 
             except IndexError:
