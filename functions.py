@@ -2,7 +2,6 @@ from nltk.stem import PorterStemmer #WordNetLemmatizer
 from models import *
 from collections import defaultdict # to get unique values in list
 import re
-import os
 from nltk.tokenize import word_tokenize
 from nltk.tag import pos_tag
 from nltk.corpus import stopwords
