@@ -2,7 +2,7 @@
 # from multiprocessing import cpu_count
 bind = '0.0.0.0:8050'
 backlog = 2048
-threads = 1 
+threads = 2
 # workers = cpu_count()
 workers = 2
 worker_class = 'sync'
