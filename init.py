@@ -3,13 +3,9 @@ import os
 
 app = Flask(__name__)
 
-CWD = os.getenv('ROOTPATH', None)
 FLASK_ENV = os.getenv('FLASK_ENV', None)
 
-if os.path.exists(CWD):
-    cwd = CWD
-else:
-    cwd = app.instance_path.replace('instance','')
+cwd = app.instance_path.replace('instance','')
 
 print(f"current working directory: {cwd}")
 print(f"flask environment: {FLASK_ENV}")
