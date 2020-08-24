@@ -1,3 +1,5 @@
+import os
+
 class Config(object):
     DEBUG = False
     TESTING = False
@@ -5,8 +7,5 @@ class Config(object):
     SESSION_COOKIE_SECURE = True
 
 class ProductionConfig(Config):
-    pass
-
-class DevelopmentConfig(Config):
     DEBUG = True
     SESSION_COOKIE_SECURE = False
