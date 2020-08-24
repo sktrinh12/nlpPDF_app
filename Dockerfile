@@ -15,4 +15,5 @@ RUN python -m nltk.downloader stopwords && \
     python -m nltk.downloader averaged_perceptron_tagger
 
 ENV FLASK_ENV=production
+ENV ROOTPATH=/home/trinhsk/nlp_app/app
 CMD ["gunicorn", "-c", "gunicorn_config.py", "app:app"]
