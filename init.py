@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, flash
 
 app = Flask(__name__)
-cwd = app.root_path
+cwd = app.instance_path.replace('instance','')
+print(cwd)
 
 app.config.from_object("config.ProductionConfig")
 
