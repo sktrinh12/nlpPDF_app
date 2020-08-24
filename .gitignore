@@ -1,8 +1,6 @@
 *.pyc
 *.pyo
-/models/*
-./models
+/models/rf_taxon_names.first
 \<Plug\>_
-models/*
 .DS_Store
 build.sh
