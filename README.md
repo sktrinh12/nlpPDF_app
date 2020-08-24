@@ -3,11 +3,11 @@
 This small flask application demonstrates use of NLTK to extract keywords (such as unique NSC identifiers and taxonomy related words) from PDF journal articles and render on the web-page for easy interpretation.
 
 #### Installation
-After installing all dependencies, run the app by entering its folder and typing:
+There are two version of the `Dockerfile`; one for testing locally and a second for deploying on the server. Choose the local version for a local install. Simply enter in the terminal: `docker build -t app-name 'path/to/app'`.
 
-`$ python app.py`
-> Another option is to run using gunicorn:
-`gunicorn -c gunicorn-config app:app`
+After installing all dependencies and building from `Dockerfile`, run the app by entering its folder and typing:
+
+`docker run -d app-name`
 
 The file could be a `.txt` or `.pdf` file. There will be two outputs, each in their own small `HTML` table:
 1. Possible NSC numbers that relate to the natural product extract (compound)
