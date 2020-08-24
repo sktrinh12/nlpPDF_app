@@ -7,10 +7,10 @@ help:
 	@echo ''
 
 build:
-	echo "copying models ..." && \ # if dont want to store the model files in 2 locations
+	echo "copying models ..." && \
 	cp ../nlp_pdf/models/*.pkl . && \
 	docker build -t $(app_name) . && \
-	rm *.pkl # remove at end for local version; server version will keep the models folder
+	rm *.pkl
 run:
 	docker run -i \
 		-t \
