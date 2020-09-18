@@ -18,6 +18,14 @@ REGEX_PATTERN = re.compile(r'\w{3,}[. ]|[ ]\w|^\d+|\w{1,}\d+') #rid of molecular
 
 HTML_WRAPPER = """<div style="overflow-x: auto; border: 0.75px solid #e6e9ef; border-radius: 0.25rem; padding: 0.75rem">{}</div>"""
 
+nsc_prefix_lst_short = [
+    'V0', '0B', '0F', 'U5', '0W',
+    'Q6', 'Q8', '0P', '0D', '0X',
+    'U4', '0G', 'Q7', '0C', 'Z0',
+    '0Y', '0M', '0E', '0V', '62',
+    '0A', 'OK', 'OCD'
+]
+
 
 def calc_weights():
     '''
@@ -362,25 +370,32 @@ def nsc_exclude(ls_vouch_nsc):
         res_list = ls_vouch_nsc
     return res_list
 
+def rtn_regex_grp(string, text_body):
+    try:
+        return re.search(rf'{string}\w+',text_body).group(0)
+    except AttributeError:
+        return None
+
 def extract_nsc(text_body):
     # vouch_nsc = re.findall(r'(^[JCNQFM]{1}\w{1,}\d{2,})', text_body)
-    vouch_nsc = re.findall(r'([J|C|N|Q|F|M]{1}\d{2,}\w+)', text_body)
     # vouch_nsc = re.findall(r'([^ABD-IK-LO-PR-Zabd-ik-lo-pr-z]\w+\d{2,})', text_body)
+    first_pass_regex_match = [rtn_regex_grp(p, text_body) for p in nsc_prefix_lst_short]
+    second_pass_regex_match = re.findall(r'([J|C|N|Q|F|M|0]{1}\d{2,}\w+)', text_body)
+    cmb_regex_matches = list(set(second_pass_regex_match + [m for m in first_pass_regex_match if m]))
     try:
-        vouch_nsc = [r for r in vouch_nsc if len(r) < 10 and len(r) > 4]
+        vouch_nsc = [r for r in cmb_regex_matches if len(r) < 10 and len(r) > 4]
     except:
         vouch_nsc = ["Didn't find any NSCs"]
-    print(vouch_nsc)
-    if len(vouch_nsc) > 1:
+    print(f'NSCs: {vouch_nsc}')
+    if len(cmb_regex_matches) > 1:
         vouch_nsc = nsc_exclude(vouch_nsc)
         if not vouch_nsc:
             # if after removing CH formulas and the list becomes empty
-            return ["Didn't find any NSCs"]
+            vouch_nsc = ["Didn't find any NSCs"]
         vouch_nsc = list(defaultdict.fromkeys(vouch_nsc).keys())
     else:
-        if vouch_nsc:
-            # if just one found
-            vouch_nsc = vouch_nsc
-        else:
+	if not vouch_nsc:
             vouch_nsc = ["Didn't find any NSCs"]
+    # filter the nscs by length of greater than 4
+    vouch_nsc = list(filter(lambda x: len(x) > 4))
     return vouch_nsc
